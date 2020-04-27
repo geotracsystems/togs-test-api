@@ -4,16 +4,20 @@ from utils.auth import oauth2_token
 import json
 import requests
 
-endpoint = bifrost['test']['endpoint'] + '/api/DeviceKeys/GetCoPilotLicenseKeys'
+
+@pytest.fixture(scope='module')
+def endpoint(env):
+    path = bifrost[env]['endpoint'] + '/api/DeviceKeys/GetCoPilotLicenseKeys'
+    return path
 
 
 @pytest.fixture()
-def token():
-    oauth2 = oauth2_token(oauth['test'])
+def token(env):
+    oauth2 = oauth2_token(oauth[env])
     return oauth2
 
 
-def test_copilot_invalid_header_blank():
+def test_copilot_invalid_header_blank(endpoint):
     header = {}
     data = {"tabletSn": "730163500077"}
 
@@ -22,7 +26,7 @@ def test_copilot_invalid_header_blank():
     assert resp.status_code == 401
 
 
-def test_copilot_no_header():
+def test_copilot_no_header(endpoint):
     data = {"tabletSn": "730163500077"}
 
     resp = requests.post(endpoint, data=json.dumps(data))
@@ -30,7 +34,7 @@ def test_copilot_no_header():
     assert resp.status_code == 401
 
 
-def test_copilot_invalid_header_notoken():
+def test_copilot_invalid_header_notoken(endpoint):
     header = {"Content-Type": "application/json"}
     data = {"tabletSn": "730163500077"}
 
@@ -39,7 +43,7 @@ def test_copilot_invalid_header_notoken():
     assert resp.status_code == 401
 
 
-def test_copilot_invalid_header_nocontenttype(token):
+def test_copilot_invalid_header_nocontenttype(token, endpoint):
     header = {"Authorization": f"Bearer {token}"}
     data = {"tabletSn": "730163500077"}
 
@@ -48,7 +52,7 @@ def test_copilot_invalid_header_nocontenttype(token):
     assert resp.status_code == 415
 
 
-def test_copilot_invalid_header_invalidtoken():
+def test_copilot_invalid_header_invalidtoken(endpoint):
     header = {"Content-Type": "application/json", "Authorization": f"Bearer invalidtoken123"}
     data = {"tabletSn": "730163500077"}
 
@@ -58,7 +62,7 @@ def test_copilot_invalid_header_invalidtoken():
     # assert resp.status_code == 401 #possible bug
 
 
-def test_copilot_invalid_body_blank(token):
+def test_copilot_invalid_body_blank(token, endpoint):
     header = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     data = {}
 
@@ -67,7 +71,7 @@ def test_copilot_invalid_body_blank(token):
     assert resp.status_code == 400
 
 
-def test_copilot_no_body(token):
+def test_copilot_no_body(token, endpoint):
     header = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
     resp = requests.post(endpoint, headers=header)
@@ -75,7 +79,7 @@ def test_copilot_no_body(token):
     assert resp.status_code == 400
 
 
-def test_copilot_invalid_data_type(token):
+def test_copilot_invalid_data_type(token, endpoint):
     header = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     data = {"tablet": "730163500077"}
 
@@ -84,7 +88,7 @@ def test_copilot_invalid_data_type(token):
     assert resp.status_code == 400
 
 
-def test_copilot_invalid_data_sn(token):
+def test_copilot_invalid_data_sn(token, endpoint):
     header = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     data = {"tabletSn": "730163077"}
 
@@ -96,7 +100,7 @@ def test_copilot_invalid_data_sn(token):
             and response['IsAuthorizedForCoPilot'] is False)
 
 
-def test_copilot_valid_mdt7p(token):
+def test_copilot_valid_mdt7p(token, endpoint):
     header = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     data = {"tabletSn": "730163500077"}
 
