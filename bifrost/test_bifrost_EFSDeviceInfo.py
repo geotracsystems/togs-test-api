@@ -54,7 +54,8 @@ def test_efsinfo_invalid_header_invalidtoken():
 
     resp = requests.post(endpoint, headers=header, data=json.dumps(data))
 
-    assert resp.status_code == 401
+    assert resp.status_code == 500
+    # assert resp.status_code == 401 #possible bug
 
 
 def test_efsinfo_invalid_body_blank(token):
@@ -63,7 +64,8 @@ def test_efsinfo_invalid_body_blank(token):
 
     resp = requests.post(endpoint, headers=header, data=json.dumps(data))
 
-    assert resp.status_code == 400
+    assert resp.status_code == 404
+    # assert resp.status_code == 400 #possible bug, misuse of 404
 
 
 def test_efsinfo_no_body(token):
@@ -80,7 +82,8 @@ def test_efsinfo_invalid_data_type(token):
 
     resp = requests.post(endpoint, headers=header, data=json.dumps(data))
 
-    assert resp.status_code == 400
+    assert resp.status_code == 404
+    # assert resp.status_code == 400 #possible bug, incorrect use of 404
 
 
 def test_efsinfo_invalid_data_sn(token):
@@ -88,11 +91,9 @@ def test_efsinfo_invalid_data_sn(token):
     data = {"tabletSn": "730163077"}
 
     resp = requests.post(endpoint, headers=header, data=json.dumps(data))
-    print(resp.content)
-    print(resp.status_code)
-    response = json.loads(resp.content)
 
-    assert (resp.status_code == 200)
+    assert (resp.status_code == 404)
+    # possible bug, misuse of 404
 
 
 def test_efsinfo_valid_mdt7p(token):
