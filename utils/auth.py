@@ -23,7 +23,7 @@ def oauth2_token(env):
         header = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
 
         response = requests.post(env['url'], headers=header, data=data)
-        print(response.content)
+        # print(response.content)
         access_token = json.loads(response.content)['access_token']
         expires_in = json.loads(response.content)['expires_in']
         expire_time = time.time() + expires_in
