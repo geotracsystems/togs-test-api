@@ -1,17 +1,11 @@
 import json
 import time
 import requests
-from utils.api_defs import oauth
-
-expire_time = 0
-access_token = 'invalidtoken'
+import utils.global_vars as g
 
 
 def oauth2_token(env):
-    global expire_time
-    global access_token
-
-    if expire_time < time.time():
+    if g.expire_time < time.time():
         data = (
             f"grant_type=password&"
             f"client_id={env['client_id']}&"
@@ -25,11 +19,8 @@ def oauth2_token(env):
         response = requests.post(env['url'], headers=header, data=data)
         # print(response.content)
         # print(response.status_code)
-        access_token = json.loads(response.content)['access_token']
+        g.access_token = json.loads(response.content)['access_token']
         expires_in = json.loads(response.content)['expires_in']
-        expire_time = time.time() + expires_in
+        g.expire_time = time.time() + expires_in
 
-    return access_token
-
-
-
+    return g.access_token

@@ -1,19 +1,22 @@
 import pytest
-from utils.api_defs import bifrost, oauth
+from utils.api_defs import bifrost
 from utils.auth import oauth2_token
 import json
 import requests
+import utils.global_vars as g
 
 
 @pytest.fixture(scope='module')
 def endpoint(env):
+    g.access_token = ''
+    g.expire_time = 0
     path = bifrost[env]['endpoint'] + '/api/D2Link/GetHostInfoFromEsn'
     return path
 
 
 @pytest.fixture()
 def token(env):
-    oauth2 = oauth2_token(oauth[env])
+    oauth2 = oauth2_token(bifrost[env]['oauth'])
     return oauth2
 
 
